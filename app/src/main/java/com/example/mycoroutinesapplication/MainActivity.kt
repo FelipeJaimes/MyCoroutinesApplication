@@ -3,7 +3,6 @@ package com.example.mycoroutinesapplication
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.WindowManager
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -20,7 +19,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun validateLogin(username: String, password: String): Boolean {
-
         return username.isNotEmpty() && password.isNotEmpty()
     }
 
