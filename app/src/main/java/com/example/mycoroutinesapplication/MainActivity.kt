@@ -4,27 +4,15 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity(), CoroutineScope {
-
-    private lateinit var job : Job
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        /**
-         * La diferencia entre Job() y SupervisorJob(), es que si en el Job(), una
-         * de las corrutinas lanza una excepcion, todas las corrutinas se cancelan.
-         * Mientras que con el SupervisorJob() esto no sucede, y las otras corrutinas
-         * siguen ejecutandoce.
-         */
-        job = SupervisorJob()
 
         submitButton.setOnClickListener {
             /**
@@ -44,7 +32,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
              * Al agregar CoroutineScope y setear el coroutineContext ya no es necesario colocar
              * GlobalScope.launch (Dispatchers.Main)
              */
-            launch {
+            lifecycleScope.launch {
                 val success = withContext(Dispatchers.IO){
                     validateLogin(userEditText.text.toString(), passwordEditText.text.toString())
                 }
@@ -53,10 +41,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    override fun onDestroy() {
-        job.cancel()
-        super.onDestroy()
-    }
 
     private fun validateLogin(username: String, password: String): Boolean {
         Thread.sleep(2000)
