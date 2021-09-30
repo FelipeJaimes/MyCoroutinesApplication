@@ -33,24 +33,16 @@ class MainActivity : AppCompatActivity() {
              * GlobalScope.launch (Dispatchers.Main)
              */
             lifecycleScope.launch {
-                val success1 = async(Dispatchers.IO){
-                    validateLogin1(userEditText.text.toString(), passwordEditText.text.toString())
+                val success = withContext(Dispatchers.IO){
+                    validateLogin(userEditText.text.toString(), passwordEditText.text.toString())
                 }
-                val success2 = async(Dispatchers.IO){
-                    validateLogin2(userEditText.text.toString(), passwordEditText.text.toString())
-                }
-                toast(if (success1.await() && success2.await()) "Success" else "Failure")
+                toast(if (success) "Success" else "Failure")
             }
         }
     }
 
 
-    private fun validateLogin1(username: String, password: String): Boolean {
-        Thread.sleep(2000)
-        return username.isNotEmpty() && password.isNotEmpty()
-    }
-
-    private fun validateLogin2(username: String, password: String): Boolean {
+    private fun validateLogin(username: String, password: String): Boolean {
         Thread.sleep(2000)
         return username.isNotEmpty() && password.isNotEmpty()
     }
