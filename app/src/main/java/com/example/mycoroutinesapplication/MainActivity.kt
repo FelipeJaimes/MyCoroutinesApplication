@@ -4,47 +4,27 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var vm: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        vm = ViewModelProvider(this)[MainViewModel::class.java]
+
+        vm.loginResult.observe(this, Observer { success ->
+            toast(if (success) "Success" else "Failure")
+        })
+
         submitButton.setOnClickListener {
-            /**
-             * GlobalScope esta ligado al ciclo de vida de la aplicacion
-             * si la aplicacion se destruye antes de que la corrutina termine
-             * lanza una excepcion. Por esa razón se aconseja NO usarlo para crear coroutines.
-             * Si se cierra el Activity la coroutine seguirá en ejecución,
-             * y seguirá en ejecución hasta que se cierre la aplicación.
-             *
-             * El Dispatcher es el hilo donde queremos que se ejecute la tarea
-             * de la corrutina:
-             * -Main, para el hilo principal
-             * -IO, para tareas de entrada y salida.
-             * -Default, para tareas de alta carga en CPU.
-             * -Unconfined, para ciertas tareas de testing.
-             *
-             * Al agregar CoroutineScope y setear el coroutineContext ya no es necesario colocar
-             * GlobalScope.launch (Dispatchers.Main)
-             */
-            lifecycleScope.launch {
-                val success = withContext(Dispatchers.IO){
-                    validateLogin(userEditText.text.toString(), passwordEditText.text.toString())
-                }
-                toast(if (success) "Success" else "Failure")
-            }
+                vm.onSubmitClicked(userEditText.text.toString(), passwordEditText.text.toString())
         }
-    }
-
-
-    private fun validateLogin(username: String, password: String): Boolean {
-        Thread.sleep(2000)
-        return username.isNotEmpty() && password.isNotEmpty()
     }
 
     private fun Context.toast(message: String){
