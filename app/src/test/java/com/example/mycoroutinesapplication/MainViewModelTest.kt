@@ -39,48 +39,48 @@ class MainViewModelTest {
     @Test
     fun `Success if user and pass are not empty`(){
         testDispatcher.runBlockingTest {
-            val observer = mock<Observer<Boolean>>()
+            val observer = mock<Observer<String>>()
             vm.loginResult.observeForever(observer)
 
             vm.onSubmitClicked("user", "pass")
 
-            verify(observer).onChanged(true)
+            verify(observer).onChanged("Success")
         }
     }
 
     @Test
     fun `Failure if user and pass are empty`(){
         testDispatcher.runBlockingTest {
-            val observer = mock<Observer<Boolean>>()
+            val observer = mock<Observer<String>>()
             vm.loginResult.observeForever(observer)
 
             vm.onSubmitClicked("", "")
 
-            verify(observer).onChanged(false)
+            verify(observer).onChanged("Failure")
         }
     }
 
     @Test
     fun `Failure if user is empty and pass is not`(){
         testDispatcher.runBlockingTest {
-            val observer = mock<Observer<Boolean>>()
+            val observer = mock<Observer<String>>()
             vm.loginResult.observeForever(observer)
 
             vm.onSubmitClicked("", "pass")
 
-            verify(observer).onChanged(false)
+            verify(observer).onChanged("Failure")
         }
     }
 
     @Test
     fun `Failure if pass is empty and user is not`(){
         testDispatcher.runBlockingTest {
-            val observer = mock<Observer<Boolean>>()
+            val observer = mock<Observer<String>>()
             vm.loginResult.observeForever(observer)
 
             vm.onSubmitClicked("user", "")
 
-            verify(observer).onChanged(false)
+            verify(observer).onChanged("Failure")
         }
     }
 }

@@ -8,36 +8,46 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.mycoroutinesapplication.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var vm: MainViewModel
+    private lateinit var viewModel: MainViewModel
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater) // Binding class for activity_main.xml
+        setContentView(binding.root)
 
-        vm = ViewModelProvider(this)[MainViewModel::class.java]
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
-        vm.loginResult.observe(this, Observer { success ->
-            toast(if (success) "Success" else "Failure")
-        })
-        vm.progressBarVisible.observe(this, Observer { visible ->
-            progressWidget.visibility = if (visible) View.VISIBLE else View.GONE
-        })
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
 
-        submitButton.setOnClickListener {
-                vm.onSubmitClicked(userEditText.text.toString(), passwordEditText.text.toString())
-            this.currentFocus?.let { view ->
-                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        //Progress bar visibility is setup with dataBinding for demo purposes
+        with(binding){
+            viewModel?.loginResult?.observe(this@MainActivity, Observer { loginResult ->
+                toast(loginResult)
+            })
+
+            submitButton.setOnClickListener {
+                //Here we still use viewBinding
+                viewModel?.onSubmitClicked(userEditText.editText?.text.toString(), passwordEditText.editText?.text.toString())
+                hideKeyboard()
             }
         }
     }
 
     private fun Context.toast(message: String){
         Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
+    }
+
+    private fun hideKeyboard(){
+        this.currentFocus?.let { view ->
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
     }
 
 }

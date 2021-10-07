@@ -12,10 +12,12 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel (val ioDispatcher: CoroutineDispatcher = Dispatchers.IO): ViewModel() {
 
-    private val _loginResult = MutableLiveData<Boolean>()
+    private val _loginResult = MutableLiveData<String>()
     private val _progressBarVisible = MutableLiveData<Boolean>()
-    val loginResult : LiveData<Boolean> get() = _loginResult
+    private val _welcomeMessage = MutableLiveData<String>("Forgot password?")
+    val loginResult : LiveData<String> get() = _loginResult
     val progressBarVisible: LiveData<Boolean> get() = _progressBarVisible
+    val welcomeMessage: LiveData<String> get() = _welcomeMessage
 
     fun onSubmitClicked(username: String, password: String){
         viewModelScope.launch {
@@ -23,13 +25,18 @@ class MainViewModel (val ioDispatcher: CoroutineDispatcher = Dispatchers.IO): Vi
             _loginResult.value = withContext(ioDispatcher){
                 validateLogin(username, password)
             }
+            _welcomeMessage.value = if (loginResult.value.equals("Success")) "Welcome!" else "Forgot password?"
             _progressBarVisible.value = false
         }
     }
 
-    private fun validateLogin(username: String, password: String) : Boolean{
+    private fun validateLogin(username: String, password: String) : String{
         Thread.sleep(2000)
-        return username.isNotEmpty() && password.isNotEmpty()
+        return if(username.isNotEmpty() && password.isNotEmpty()){
+            "Success"
+        } else {
+            "Failure"
+        }
     }
 
 }
